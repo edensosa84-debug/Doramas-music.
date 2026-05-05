@@ -25,7 +25,6 @@
             min-height: 100vh;
         }
 
-        /* NAVEGACIÓN Y BUSCADOR */
         nav {
             background: linear-gradient(to bottom, rgba(0,0,0,1) 20%, transparent);
             padding: 25px 4%;
@@ -54,7 +53,6 @@
             outline: none; width: 180px; margin-left: 10px; font-weight: bold;
         }
 
-        /* CUADRÍCULA AUTO-ORGANIZADA */
         .main-container { padding: 160px 5% 80px; flex: 1; }
 
         .video-grid { 
@@ -82,7 +80,6 @@
         .video-info { padding: 20px; background: #111; }
         .video-info strong { color: var(--electric-blue); font-size: 1.2rem; }
 
-        /* MODAL Y REPRODUCTOR */
         .modal {
             display: none; position: fixed; z-index: 2000;
             left: 0; top: 0; width: 100%; height: 100%;
@@ -169,16 +166,12 @@
 
     <script>
         const catalogos = {
-            // Lista actualizada con tus 14 videos de la imagen
-            "Musica Doramas 1": [
-                "1.mp4", "2.mp4", "3.mp4", "4.mp4", "5.mp4", 
-                "6.mp4", "7.mp4", "8.mp4", "9.mp4", "10.mp4", 
-                "11.mp4", "12.mp4", "13.mp4", "14.mp4"
-            ],
-            "K-Pop Hits": [],
-            "Nuevos Estrenos": [],
-            "Favoritos Rick": []
-        };
+    // Usa los nombres exactos que vimos con el comando 'find'
+    "Musica Doramas 1": ["Aer.mp4.mp4", "Amor.mp4.mp4", "Luna.mp4.mp4"],
+    "K-Pop Hits": [],
+    "Nuevos Estrenos": [],
+    "Favoritos Rick": []
+};
 
         const grid = document.getElementById('videoGrid');
         const modal = document.getElementById('videoModal');
