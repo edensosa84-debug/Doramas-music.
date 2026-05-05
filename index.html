@@ -55,6 +55,20 @@
 
         .main-container { padding: 160px 5% 80px; flex: 1; }
 
+        /* ESTILO DEL CONTADOR TOTAL */
+        .stats-bar {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--netflix-red);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: var(--electric-blue);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
         .video-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
@@ -134,6 +148,9 @@
     </nav>
 
     <div class="main-container">
+        <!-- CONTADOR DINÁMICO -->
+        <div class="stats-bar" id="totalCounter">Cargando biblioteca...</div>
+        
         <h2 style="color: var(--netflix-red); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px;">Catálogos Premium</h2>
         <div id="videoGrid" class="video-grid"></div>
     </div>
@@ -166,12 +183,19 @@
 
     <script>
         const catalogos = {
-    // Usa los nombres exactos que vimos con el comando 'find'
-    "Musica Doramas 1": ["Aer.mp4.mp4", "Amor.mp4.mp4", "Luna.mp4.mp4"],
-    "K-Pop Hits": [],
-    "Nuevos Estrenos": [],
-    "Favoritos Rick": []
-};
+            // LISTA ACUMULADA: Los 3 viejos + 3 nuevos con nombres al azar
+            "Musica Doramas 1": [
+                "Aer.mp4", 
+                "Amor.mp4", 
+                "Luna.mp4", 
+                "Estrella_Noche.mp4", 
+                "Ritmo_Coreano.mp4", 
+                "Melodia_Dulce.mp4"
+            ],
+            "K-Pop Hits": [],
+            "Nuevos Estrenos": [],
+            "Favoritos Rick": []
+        };
 
         const grid = document.getElementById('videoGrid');
         const modal = document.getElementById('videoModal');
@@ -180,14 +204,19 @@
         const searchInput = document.getElementById('searchInput');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const totalCounter = document.getElementById('totalCounter');
         
         let currentList = [];
         let currentIndex = 0;
 
         function renderGrid() {
             grid.innerHTML = "";
+            let totalVideos = 0;
+
             Object.keys(catalogos).forEach(nombre => {
                 const videos = catalogos[nombre];
+                totalVideos += videos.length; // Sumamos al contador total
+
                 const card = document.createElement('div');
                 card.className = 'video-card searchable-item';
                 
@@ -205,6 +234,9 @@
                 card.onclick = () => openModal(nombre);
                 grid.appendChild(card);
             });
+
+            // Actualizamos el contador visual
+            totalCounter.innerText = `Total en biblioteca: ${totalVideos} videos disponibles`;
         }
 
         function openModal(nombre) {
@@ -228,7 +260,7 @@
                 item.innerHTML = `
                     <div style="width:30px; color:var(--netflix-red); font-weight:900;">${i+1}</div>
                     <div class="ep-thumb"><video muted><source src="Video/${archivo}"></video></div>
-                    <div><strong style="color:white;">Video ${archivo.replace('.mp4', '')}</strong></div>
+                    <div><strong style="color:white;">${archivo.replace('.mp4', '').replace(/_/g, ' ')}</strong></div>
                 `;
                 item.onclick = () => playVideo(i);
                 epListContainer.appendChild(item);
