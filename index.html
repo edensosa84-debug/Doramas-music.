@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Rick | Premium</title>
+    <title>Music Rick | Premium Player</title>
     <style>
         :root {
             --netflix-red: #ff0000;
@@ -169,7 +169,7 @@
 
     <script>
         const catalogos = {
-            // Se agregaron todos los videos de tu carpeta (del 1 al 14)
+            // Lista actualizada con tus 14 videos de la imagen
             "Musica Doramas 1": [
                 "1.mp4", "2.mp4", "3.mp4", "4.mp4", "5.mp4", 
                 "6.mp4", "7.mp4", "8.mp4", "9.mp4", "10.mp4", 
@@ -184,6 +184,9 @@
         const modal = document.getElementById('videoModal');
         const mainVideo = document.getElementById('mainVideo');
         const epListContainer = document.getElementById('episodesList');
+        const searchInput = document.getElementById('searchInput');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
         
         let currentList = [];
         let currentIndex = 0;
@@ -232,7 +235,7 @@
                 item.innerHTML = `
                     <div style="width:30px; color:var(--netflix-red); font-weight:900;">${i+1}</div>
                     <div class="ep-thumb"><video muted><source src="Video/${archivo}"></video></div>
-                    <div><strong style="color:white;">Capítulo ${archivo.replace('.mp4', '')}</strong></div>
+                    <div><strong style="color:white;">Video ${archivo.replace('.mp4', '')}</strong></div>
                 `;
                 item.onclick = () => playVideo(i);
                 epListContainer.appendChild(item);
@@ -243,12 +246,12 @@
             currentIndex = index;
             mainVideo.src = `Video/${currentList[currentIndex]}`;
             mainVideo.play();
-            document.getElementById('prevBtn').disabled = currentIndex === 0;
-            document.getElementById('nextBtn').disabled = currentIndex === currentList.length - 1;
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === currentList.length - 1;
         }
 
-        document.getElementById('nextBtn').onclick = () => { if (currentIndex < currentList.length - 1) playVideo(currentIndex + 1); };
-        document.getElementById('prevBtn').onclick = () => { if (currentIndex > 0) playVideo(currentIndex - 1); };
+        nextBtn.onclick = () => { if (currentIndex < currentList.length - 1) playVideo(currentIndex + 1); };
+        prevBtn.onclick = () => { if (currentIndex > 0) playVideo(currentIndex - 1); };
 
         mainVideo.onended = () => {
             if (document.getElementById('autoPlayCheck').checked && currentIndex < currentList.length - 1) {
@@ -256,7 +259,7 @@
             }
         };
 
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.searchable-item').forEach(card => {
                 const title = card.querySelector('strong').innerText.toLowerCase();
