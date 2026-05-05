@@ -55,7 +55,6 @@
 
         .main-container { padding: 160px 5% 80px; flex: 1; }
 
-        /* ESTILO DEL CONTADOR TOTAL */
         .stats-bar {
             background: rgba(255, 0, 0, 0.1);
             border: 1px solid var(--netflix-red);
@@ -67,7 +66,6 @@
             color: var(--electric-blue);
             text-transform: uppercase;
             font-size: 0.9rem;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
         }
 
         .video-grid { 
@@ -80,7 +78,6 @@
             background-color: var(--card-gray); 
             border-radius: 12px; overflow: hidden; cursor: pointer;
             border: 1px solid #333; transition: 0.4s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .video-card:hover { transform: scale(1.05); border-color: var(--netflix-red); }
@@ -105,6 +102,7 @@
             background-color: #0f0f0f; margin: 1% auto;
             width: 95%; max-width: 1000px; border-radius: 15px;
             position: relative; border: 1px solid #222;
+            max-height: 95vh; display: flex; flex-direction: column;
         }
 
         .close-modal {
@@ -112,18 +110,27 @@
             font-size: 45px; cursor: pointer; color: var(--netflix-red); z-index: 100;
         }
 
-        #mainVideo { width: 100%; border-radius: 15px 15px 0 0; background: #000; }
+        #mainVideo { width: 100%; border-radius: 15px 15px 0 0; background: #000; flex-shrink: 0; }
 
         .player-controls {
-            padding: 20px 30px; background: #151515;
+            padding: 15px 30px; background: #151515;
             display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #333; flex-shrink: 0;
         }
+
+        #episodesList {
+            overflow-y: auto; 
+            flex-grow: 1;
+            padding-bottom: 20px;
+        }
+
+        #episodesList::-webkit-scrollbar { width: 8px; }
+        #episodesList::-webkit-scrollbar-thumb { background: var(--netflix-red); border-radius: 10px; }
 
         .btn-player {
             background: var(--netflix-red);
             border: none; color: white;
-            padding: 12px 20px; border-radius: 50px;
+            padding: 10px 20px; border-radius: 50px;
             cursor: pointer; font-weight: bold; text-transform: uppercase;
         }
         .btn-player:disabled { background: #444; cursor: not-allowed; }
@@ -149,9 +156,7 @@
     </nav>
 
     <div class="main-container">
-        <!-- CONTADOR DINÁMICO -->
         <div class="stats-bar" id="totalCounter">Cargando biblioteca...</div>
-        
         <h2 style="color: var(--netflix-red); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px;">Catálogos Premium</h2>
         <div id="videoGrid" class="video-grid"></div>
     </div>
@@ -166,16 +171,16 @@
                     <input type="checkbox" id="autoPlayCheck" checked style="accent-color: var(--netflix-red); transform: scale(1.5);">
                     <label for="autoPlayCheck" style="font-size: 1rem; font-weight: bold;">AUTO-REPRODUCIR</label>
                 </div>
-                
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-player" id="prevBtn">⏮️ Atrás</button>
                     <button class="btn-player" id="nextBtn">Siguiente ⏭️</button>
                 </div>
             </div>
 
-            <div style="padding: 25px 30px; border-bottom: 1px solid #333;">
-                <h3 id="modalTitle" style="color: var(--electric-blue); margin: 0; text-transform: uppercase;"></h3>
+            <div style="padding: 20px 30px; border-bottom: 1px solid #333; background: #0f0f0f;">
+                <h3 id="modalTitle" style="color: var(--electric-blue); margin: 0; text-transform: uppercase; font-size: 1.1rem;"></h3>
             </div>
+            
             <div id="episodesList"></div>
         </div>
     </div>
@@ -184,13 +189,12 @@
 
     <script>
         const catalogos = {
-            // LISTA ACTUALIZADA: 3 Originales + 3 Anteriores + 9 Nuevos (Total 15)
             "Musica Doramas 1": [
-                "Aer.mp4", "Amor.mp4", "Luna.mp4", 
-                "Estrella_Noche.mp4", "Ritmo_Coreano.mp4", "Melodia_Dulce.mp4",
-                "Cielo_Azul.mp4", "Bajo_la_Lluvia.mp4", "Primer_Beso.mp4",
-                "Destino_Cruel.mp4", "Amor_Eterno.mp4", "Viento_de_Invierno.mp4",
-                "Sol_Naciente.mp4", "Recuerdos_de_Seul.mp4", "Corazon_de_Cristal.mp4"
+                "Aer.mp4", "Amanecer Dorado.mp4", "Amor.mp4", "Amor_Eterno.mp4", "Bajo_la_Lluvia.mp4", 
+                "Camino al Exito.mp4", "Cielo_Azul.mp4", "Corazon_de_Cristal.mp4", "Destino_Cruel.mp4", 
+                "Estrella_Noche.mp4", "Fuego Interior.mp4", "Luna.mp4", "Luz de Luna.mp4", 
+                "Melodia Dulce.mp4", "Primer_Beso.mp4", "Recuerdos de Seul.mp4", "Ritmo_Coreano.mp4", 
+                "Sol Naciente.mp4", "Susurro del Mar.mp4", "Viento_de_invierno.mp4"
             ],
             "K-Pop Hits": [],
             "Nuevos Estrenos": [],
@@ -201,9 +205,6 @@
         const modal = document.getElementById('videoModal');
         const mainVideo = document.getElementById('mainVideo');
         const epListContainer = document.getElementById('episodesList');
-        const searchInput = document.getElementById('searchInput');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
         const totalCounter = document.getElementById('totalCounter');
         
         let currentList = [];
@@ -211,31 +212,22 @@
 
         function renderGrid() {
             grid.innerHTML = "";
-            let totalVideos = 0;
-
+            let total = 0;
             Object.keys(catalogos).forEach(nombre => {
                 const videos = catalogos[nombre];
-                totalVideos += videos.length;
-
+                total += videos.length;
                 const card = document.createElement('div');
                 card.className = 'video-card searchable-item';
                 
-                let mediaHTML = videos.length > 0 
-                    ? `<video muted><source src="Video/${videos[0]}" type="video/mp4"></video>`
+                let media = videos.length > 0 
+                    ? `<video muted><source src="Video/${videos[0]}" type="video/mp4"></video>` 
                     : `<span style="color:#333; font-size:3.5rem;">🔒</span>`;
-
-                card.innerHTML = `
-                    <div class="card-preview">${mediaHTML}</div>
-                    <div class="video-info">
-                        <strong>${nombre}</strong><br>
-                        <small style="color:#888">${videos.length} VIDEOS</small>
-                    </div>
-                `;
+                
+                card.innerHTML = `<div class="card-preview">${media}</div><div class="video-info"><strong>${nombre}</strong><br><small style="color:#888">${videos.length} VIDEOS</small></div>`;
                 card.onclick = () => openModal(nombre);
                 grid.appendChild(card);
             });
-
-            totalCounter.innerText = `Total en biblioteca: ${totalVideos} canciones disponibles`;
+            totalCounter.innerText = `Total en biblioteca: ${total} archivos disponibles`;
         }
 
         function openModal(nombre) {
@@ -249,19 +241,11 @@
 
         function renderEpisodes() {
             epListContainer.innerHTML = "";
-            if(currentList.length === 0) {
-                epListContainer.innerHTML = `<p style="padding:50px; text-align:center; color:#555; font-weight:bold;">CONTENIDO PRÓXIMAMENTE...</p>`;
-                return;
-            }
             currentList.forEach((archivo, i) => {
                 const item = document.createElement('div');
                 item.className = 'ep-item';
                 let nombreLimpio = archivo.replace('.mp4', '').replace(/_/g, ' ');
-                item.innerHTML = `
-                    <div style="width:30px; color:var(--netflix-red); font-weight:900;">${i+1}</div>
-                    <div class="ep-thumb"><video muted><source src="Video/${archivo}"></video></div>
-                    <div><strong style="color:white;">${nombreLimpio}</strong></div>
-                `;
+                item.innerHTML = `<div style="width:30px; color:var(--netflix-red); font-weight:900;">${i+1}</div><div class="ep-thumb"><video muted><source src="Video/${archivo}" type="video/mp4"></video></div><div><strong style="color:white;">${nombreLimpio}</strong></div>`;
                 item.onclick = () => playVideo(i);
                 epListContainer.appendChild(item);
             });
@@ -270,21 +254,18 @@
         function playVideo(index) {
             currentIndex = index;
             mainVideo.src = `Video/${currentList[currentIndex]}`;
+            mainVideo.load();
             mainVideo.play();
-            prevBtn.disabled = currentIndex === 0;
-            nextBtn.disabled = currentIndex === currentList.length - 1;
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === currentList.length - 1;
         }
 
-        nextBtn.onclick = () => { if (currentIndex < currentList.length - 1) playVideo(currentIndex + 1); };
-        prevBtn.onclick = () => { if (currentIndex > 0) playVideo(currentIndex - 1); };
+        document.getElementById('nextBtn').onclick = () => { if (currentIndex < currentList.length - 1) playVideo(currentIndex + 1); };
+        document.getElementById('prevBtn').onclick = () => { if (currentIndex > 0) playVideo(currentIndex - 1); };
 
-        mainVideo.onended = () => {
-            if (document.getElementById('autoPlayCheck').checked && currentIndex < currentList.length - 1) {
-                playVideo(currentIndex + 1);
-            }
-        };
+        mainVideo.onended = () => { if (document.getElementById('autoPlayCheck').checked && currentIndex < currentList.length - 1) playVideo(currentIndex + 1); };
 
-        searchInput.addEventListener('input', (e) => {
+        document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.searchable-item').forEach(card => {
                 const title = card.querySelector('strong').innerText.toLowerCase();
