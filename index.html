@@ -67,6 +67,7 @@
             color: var(--electric-blue);
             text-transform: uppercase;
             font-size: 0.9rem;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
         }
 
         .video-grid { 
@@ -183,14 +184,13 @@
 
     <script>
         const catalogos = {
-            // LISTA ACUMULADA: Los 3 viejos + 3 nuevos con nombres al azar
+            // LISTA ACTUALIZADA: 3 Originales + 3 Anteriores + 9 Nuevos (Total 15)
             "Musica Doramas 1": [
-                "Aer.mp4", 
-                "Amor.mp4", 
-                "Luna.mp4", 
-                "Estrella_Noche.mp4", 
-                "Ritmo_Coreano.mp4", 
-                "Melodia_Dulce.mp4"
+                "Aer.mp4", "Amor.mp4", "Luna.mp4", 
+                "Estrella_Noche.mp4", "Ritmo_Coreano.mp4", "Melodia_Dulce.mp4",
+                "Cielo_Azul.mp4", "Bajo_la_Lluvia.mp4", "Primer_Beso.mp4",
+                "Destino_Cruel.mp4", "Amor_Eterno.mp4", "Viento_de_Invierno.mp4",
+                "Sol_Naciente.mp4", "Recuerdos_de_Seul.mp4", "Corazon_de_Cristal.mp4"
             ],
             "K-Pop Hits": [],
             "Nuevos Estrenos": [],
@@ -215,7 +215,7 @@
 
             Object.keys(catalogos).forEach(nombre => {
                 const videos = catalogos[nombre];
-                totalVideos += videos.length; // Sumamos al contador total
+                totalVideos += videos.length;
 
                 const card = document.createElement('div');
                 card.className = 'video-card searchable-item';
@@ -235,8 +235,7 @@
                 grid.appendChild(card);
             });
 
-            // Actualizamos el contador visual
-            totalCounter.innerText = `Total en biblioteca: ${totalVideos} videos disponibles`;
+            totalCounter.innerText = `Total en biblioteca: ${totalVideos} canciones disponibles`;
         }
 
         function openModal(nombre) {
@@ -257,10 +256,11 @@
             currentList.forEach((archivo, i) => {
                 const item = document.createElement('div');
                 item.className = 'ep-item';
+                let nombreLimpio = archivo.replace('.mp4', '').replace(/_/g, ' ');
                 item.innerHTML = `
                     <div style="width:30px; color:var(--netflix-red); font-weight:900;">${i+1}</div>
                     <div class="ep-thumb"><video muted><source src="Video/${archivo}"></video></div>
-                    <div><strong style="color:white;">${archivo.replace('.mp4', '').replace(/_/g, ' ')}</strong></div>
+                    <div><strong style="color:white;">${nombreLimpio}</strong></div>
                 `;
                 item.onclick = () => playVideo(i);
                 epListContainer.appendChild(item);
