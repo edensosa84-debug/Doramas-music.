@@ -1,0 +1,100 @@
+:root {
+    --red: #E50914;
+    --cyan: #00cfd5;
+}
+
+body {
+    margin: 0;
+    color: white;
+    font-family: Arial, sans-serif;
+    background-color: #141414;
+    /* EL SECRETO: ../ sale de la carpeta css para entrar a Img */
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('../Img/miku_fondo.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0; width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.logo { color: var(--red); font-size: 2rem; font-weight: bold; text-decoration: none; }
+
+.search-pro {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+.search-pro input { background: transparent; border: none; color: white; outline: none; width: 150px; }
+
+.main-content { padding: 120px 5% 50px; }
+
+.grid-series {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.card-serie {
+    background: rgba(0,0,0,0.7);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card-serie:hover { transform: scale(1.05); border-color: var(--cyan); }
+
+.card-img { height: 120px; background: #000; }
+.card-img video { width: 100%; height: 100%; object-fit: cover; }
+.card-info { padding: 15px; }
+.badge { color: var(--cyan); font-weight: bold; font-size: 0.8rem; }
+
+/* MODALES */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 2000; justify-content: center; align-items: center;
+}
+
+.modal-box {
+    background: #181818; width: 90%; max-width: 800px;
+    border-radius: 15px; position: relative; overflow: hidden;
+}
+
+.modal-banner {
+    height: 300px;
+    background: linear-gradient(to top, #181818, transparent), url('../Img/miku_fondo.jpg') center/cover;
+    display: flex; align-items: flex-end; padding: 40px;
+}
+
+.btn-play { background: white; border: none; padding: 12px 30px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+#player-screen {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; z-index: 3000;
+}
+#player-screen video { width: 100%; height: 100%; }
+
+.btn-exit { position: absolute; top: 20px; left: 20px; color: white; cursor: pointer; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; }
+
+/* ADAPTABLE A CELULARES */
+@media (max-width: 600px) {
+    .grid-series { grid-template-columns: 1fr 1fr; }
+    .logo { font-size: 1.5rem; }
+    .search-pro input { width: 100px; }
+}

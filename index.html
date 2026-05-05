@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Rick | Premium</title>
+    <style>
+        :root {
+            --netflix-red: #ff0000;
+            --electric-blue: #00d4ff;
+            --dark-bg: #0a0a0a;
+            --card-gray: #1a1a1a;
+            --text-shadow: 2px 2px 10px rgba(255, 0, 0, 0.5);
+        }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), 
+                        url('img/cute.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            color: #ffffff; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* NAVEGACIÓN Y BUSCADOR */
+        nav {
+            background: linear-gradient(to bottom, rgba(0,0,0,1) 20%, transparent);
+            padding: 25px 4%;
+            position: fixed;
+            top: 0; width: 100%; box-sizing: border-box;
+            z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo { 
+            color: var(--netflix-red); 
+            font-size: 2.2rem; font-weight: 900; text-decoration: none;
+            text-transform: uppercase; text-shadow: var(--text-shadow); letter-spacing: -2px;
+        }
+
+        .search-box {
+            display: flex; align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--netflix-red);
+            padding: 8px 15px; border-radius: 50px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .search-box input {
+            background: transparent; border: none; color: white;
+            outline: none; width: 180px; margin-left: 10px; font-weight: bold;
+        }
+
+        /* CUADRÍCULA AUTO-ORGANIZADA */
+        .main-container { padding: 160px 5% 80px; flex: 1; }
+
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 35px; 
+        }
+
+        .video-card {
+            background-color: var(--card-gray); 
+            border-radius: 12px; overflow: hidden; cursor: pointer;
+            border: 1px solid #333; transition: 0.4s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .video-card:hover { transform: scale(1.05); border-color: var(--netflix-red); }
+
+        .card-preview {
+            width: 100%; aspect-ratio: 16/9; background: #000;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .card-preview video { width: 100%; height: 100%; object-fit: cover; }
+
+        .video-info { padding: 20px; background: #111; }
+        .video-info strong { color: var(--electric-blue); font-size: 1.2rem; }
+
+        /* MODAL Y REPRODUCTOR */
+        .modal {
+            display: none; position: fixed; z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.96); backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background-color: #0f0f0f; margin: 1% auto;
+            width: 95%; max-width: 1000px; border-radius: 15px;
+            position: relative; border: 1px solid #222;
+        }
+
+        .close-modal {
+            position: absolute; right: 25px; top: 15px;
+            font-size: 45px; cursor: pointer; color: var(--netflix-red); z-index: 100;
+        }
+
+        #mainVideo { width: 100%; border-radius: 15px 15px 0 0; background: #000; }
+
+        .player-controls {
+            padding: 20px 30px; background: #151515;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn-player {
+            background: var(--netflix-red);
+            border: none; color: white;
+            padding: 12px 20px; border-radius: 50px;
+            cursor: pointer; font-weight: bold; text-transform: uppercase;
+        }
+        .btn-player:disabled { background: #444; cursor: not-allowed; }
+
+        .ep-item {
+            display: flex; align-items: center; gap: 20px;
+            padding: 15px 30px; border-bottom: 1px solid #222; cursor: pointer;
+        }
+        .ep-item:hover { background: #1a1a1a; }
+        .ep-thumb { width: 130px; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; }
+
+        footer { padding: 50px 4%; text-align: center; color: var(--netflix-red); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo">Music Rick</a>
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="BUSCAR TU MÚSICA...">
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <h2 style="color: var(--netflix-red); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 40px;">Catálogos Premium</h2>
+        <div id="videoGrid" class="video-grid"></div>
+    </div>
+
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <video id="mainVideo" controls></video>
+            
+            <div class="player-controls">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="checkbox" id="autoPlayCheck" checked style="accent-color: var(--netflix-red); transform: scale(1.5);">
+                    <label for="autoPlayCheck" style="font-size: 1rem; font-weight: bold;">AUTO-REPRODUCIR</label>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-player" id="prevBtn">⏮️ Atrás</button>
+                    <button class="btn-player" id="nextBtn">Siguiente ⏭️</button>
+                </div>
+            </div>
+
+            <div style="padding: 25px 30px; border-bottom: 1px solid #333;">
+                <h3 id="modalTitle" style="color: var(--electric-blue); margin: 0; text-transform: uppercase;"></h3>
+            </div>
+            <div id="episodesList"></div>
+        </div>
+    </div>
+
+    <footer><p>Rick Entretenimiento &copy; 2026 | PREMIUM EXPERIENCE</p></footer>
+
+    <script>
+        const catalogos = {
+            // Se agregaron todos los videos de tu carpeta (del 1 al 14)
+            "Musica Doramas 1": [
+                "1.mp4", "2.mp4", "3.mp4", "4.mp4", "5.mp4", 
+                "6.mp4", "7.mp4", "8.mp4", "9.mp4", "10.mp4", 
+                "11.mp4", "12.mp4", "13.mp4", "14.mp4"
+            ],
+            "K-Pop Hits": [],
+            "Nuevos Estrenos": [],
+            "Favoritos Rick": []
+        };
+
+        const grid = document.getElementById('videoGrid');
+        const modal = document.getElementById('videoModal');
+        const mainVideo = document.getElementById('mainVideo');
+        const epListContainer = document.getElementById('episodesList');
+        
+        let currentList = [];
+        let currentIndex = 0;
+
+        function renderGrid() {
+            grid.innerHTML = "";
+            Object.keys(catalogos).forEach(nombre => {
+                const videos = catalogos[nombre];
+                const card = document.createElement('div');
+                card.className = 'video-card searchable-item';
+                
+                let mediaHTML = videos.length > 0 
+                    ? `<video muted><source src="Video/${videos[0]}" type="video/mp4"></video>`
+                    : `<span style="color:#333; font-size:3.5rem;">🔒</span>`;
+
+                card.innerHTML = `
+                    <div class="card-preview">${mediaHTML}</div>
+                    <div class="video-info">
+                        <strong>${nombre}</strong><br>
+                        <small style="color:#888">${videos.length} VIDEOS</small>
+                    </div>
+                `;
+                card.onclick = () => openModal(nombre);
+                grid.appendChild(card);
+            });
+        }
+
+        function openModal(nombre) {
+            currentList = catalogos[nombre];
+            document.getElementById('modalTitle').innerText = nombre;
+            modal.style.display = "block";
+            document.body.style.overflow = "hidden";
+            renderEpisodes();
+            if(currentList.length > 0) playVideo(0);
+        }
+
+        function renderEpisodes() {
+            epListContainer.innerHTML = "";
+            if(currentList.length === 0) {
+                epListContainer.innerHTML = `<p style="padding:50px; text-align:center; color:#555; font-weight:bold;">CONTENIDO PRÓXIMAMENTE...</p>`;
+                return;
+            }
+            currentList.forEach((archivo, i) => {
+                const item = document.createElement('div');
+                item.className = 'ep-item';
+                item.innerHTML = `
+                    <div style="width:30px; color:var(--netflix-red); font-weight:900;">${i+1}</div>
+                    <div class="ep-thumb"><video muted><source src="Video/${archivo}"></video></div>
+                    <div><strong style="color:white;">Capítulo ${archivo.replace('.mp4', '')}</strong></div>
+                `;
+                item.onclick = () => playVideo(i);
+                epListContainer.appendChild(item);
+            });
+        }
+
+        function playVideo(index) {
+            currentIndex = index;
+            mainVideo.src = `Video/${currentList[currentIndex]}`;
+            mainVideo.play();
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === currentList.length - 1;
+        }
+
+        document.getElementById('nextBtn').onclick = () => { if (currentIndex < currentList.length - 1) playVideo(currentIndex + 1); };
+        document.getElementById('prevBtn').onclick = () => { if (currentIndex > 0) playVideo(currentIndex - 1); };
+
+        mainVideo.onended = () => {
+            if (document.getElementById('autoPlayCheck').checked && currentIndex < currentList.length - 1) {
+                playVideo(currentIndex + 1);
+            }
+        };
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            document.querySelectorAll('.searchable-item').forEach(card => {
+                const title = card.querySelector('strong').innerText.toLowerCase();
+                card.style.display = title.includes(term) ? "block" : "none";
+            });
+        });
+
+        document.querySelector('.close-modal').onclick = () => {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+            mainVideo.pause();
+        };
+
+        renderGrid();
+    </script>
+</body>
+</html>
